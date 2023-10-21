@@ -1,0 +1,74 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.6.15'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'md.orange'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+	implementation 'org.liquibase:liquibase-core'
+
+	compileOnly 'org.projectlombok:lombok'
+
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	annotationProcessor 'org.projectlombok:lombok'
+
+	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+	implementation 'io.springfox:springfox-swagger2:2.9.2'
+	implementation 'io.swagger:swagger-models:1.6.2'
+	implementation 'io.swagger:swagger-annotations:1.6.2'
+	implementation 'io.springfox:springfox-bean-validators:2.9.2'
+
+	implementation 'org.apache.commons:commons-vfs2:2.8.0'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+	implementation 'org.apache.commons:commons-text:1.9'
+	implementation 'commons-io:commons-io:2.8.0'
+	implementation 'commons-validator:commons-validator:1.7'
+	implementation 'org.apache.commons:commons-csv:1.9.0'
+
+	implementation 'io.micrometer:micrometer-observation:1.11.1'
+
+	implementation 'com.nimbusds:nimbus-jose-jwt:9.37'
+	implementation 'io.jsonwebtoken:jjwt:0.8.0'
+
+	implementation 'ch.qos.logback:logback-core'
+	testImplementation 'ch.qos.logback:logback-classic'
+
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

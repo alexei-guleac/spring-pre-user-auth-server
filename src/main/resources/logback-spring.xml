@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="15 seconds">
+  <!--<configuration scan="true" scanPeriod="15 seconds" debug="true">-->
+
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
+  <springProperty scope="context" name="mailHost" source="mail.host"/>
+  <springProperty scope="context" name="mailPort" source="mail.port"/>
+  <springProperty scope="context" name="mailStartTls" source="mail.smtp-starttls-enable"/>
+
+  <springProfile name="dev | t01 | dev-md | t01-local | prod">
+    <property name="LOG_DIR" value="logs/app"/>
+    <property name="LOG_DIR_DEBUG" value="logs/app/debug"/>
+    <property name="LOG_DIR_USER" value="logs/app/users"/>
+    <property name="LOG_DIR_REQ" value="logs/app/requests"/>
+    <property name="LOG_FILE_MAX_SIZE" value="35MB"/>
+    <property name="LOG_FILE_MAX_HIST" value="7"/>
+  </springProfile>
+  <springProfile name="dev-oro | t01-oro | prod-oro">
+    <property name="LOG_DIR" value="logs/app"/>
+    <property name="LOG_DIR_USER" value="logs/app/users"/>
+    <property name="LOG_DIR_DEBUG" value="logs/app/debug"/>
+    <property name="LOG_DIR_REQ" value="logs/app/requests"/>
+    <property name="LOG_FILE_MAX_SIZE" value="35MB"/>
+    <property name="LOG_FILE_MAX_HIST" value="7"/>
+  </springProfile>
+  <springProfile name="dev-pol | t01-pol">
+    <property name="LOG_DIR" value="logs/app"/>
+    <property name="LOG_DIR_USER" value="logs/app/users"/>
+    <property name="LOG_DIR_DEBUG" value="logs/app/debug"/>
+    <property name="LOG_DIR_REQ" value="logs/app/requests"/>
+    <property name="LOG_FILE_MAX_SIZE" value="35MB"/>
+    <property name="LOG_FILE_MAX_HIST" value="365"/>       <!--    12 months    -->
+    <property name="LOG_FILE_EX_MAX_HIST" value="426"/>    <!--    16 months    -->
+  </springProfile>
+
+  <property name="LOG_FILE_APP" value="app"/>
+  <property name="LOG_FILE_H" value="hibernate"/>
+  <property name="LOG_FILE_EXCH" value="exchange"/>
+  <property name="LOG_FILE_SENS" value="sensor"/>
+  <property name="LOG_FILE_K" value="keycloak"/>
+  <property name="LOG_FILE_EX" value="exceptions"/>
+  <property name="LOG_FILE_WARN" value="warns"/>
+  <property name="LOG_FILE_USER" value="user"/>
+
+  <!-- To enable JMX Management -->
+  <jmxConfigurator/>
+
+  <property name="FILE_PATTERN"
+    value="%date{ISO8601} | %-5level | %-30.30logger{30} | %thread | %msg%n%rEx{full,
+            java.lang.reflect.Method,
+            javax,
+            java.util.concurrent,
+            java.lang.Thread,
+            org.apache.catalina,
+            org.apache.tomcat,
+            org.apache.coyote,
+            org.springframework.aop,
+            org.springframework.boot.actuate,
+            org.springframework.security,
+            org.springframework.transaction,
+            org.springframework.web,
+            sun.reflect,
+            net.sf.cglib,
+            ByCGLIB
+      }"
+  />
+  <property name="CONSOLE_PATTERN"
+    value="%date{ISO8601} | %highlight(%-5level) | %cyan(%thread) | %boldYellow(%-30.30logger{30}) | %msg%n%rEx{full,
+            java.lang.reflect.Method,
+            javax,
+            java.util.concurrent,
+            java.lang.Thread,
+            org.apache.catalina,
+            org.apache.tomcat,
+            org.apache.coyote,
+            org.springframework.aop,
+            org.springframework.boot.actuate,
+            org.springframework.security,
+            org.springframework.transaction,
+            org.springframework.web,
+            sun.reflect,
+            net.sf.cglib,
+            ByCGLIB
+      }"
+  />
+  <property name="EXCHANGE_PATTERN"
+    value="%date{ISO8601} | %-5level | %-30.30logger{30} | %thread | %msg%n%rEx{full,
+            java.lang.reflect.Method,
+            javax,
+            java.util.concurrent,
+            java.lang.Thread,
+            org.apache.catalina,
+            org.apache.tomcat,
+            org.apache.coyote,
+            org.springframework.aop,
+            org.springframework.boot.actuate,
+            org.springframework.security,
+            org.springframework.transaction,
+            org.springframework.web,
+            sun.reflect,
+            net.sf.cglib,
+            ByCGLIB
+      }"
+  />
+  <property name="SENSOR_PATTERN"
+    value="%date{ISO8601} | %-5level | %-30.30logger{30} | %thread | %msg%n%rEx{full,
+            java.lang.reflect.Method,
+            javax,
+            java.util.concurrent,
+            java.lang.Thread,
+            org.apache.catalina,
+            org.apache.tomcat,
+            org.apache.coyote,
+            org.springframework.aop,
+            org.springframework.boot.actuate,
+            org.springframework.security,
+            org.springframework.transaction,
+            org.springframework.web,
+            sun.reflect,
+            net.sf.cglib,
+            ByCGLIB
+      }"
+  />
+
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${LOG_FILE_APP}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover -->
+      <fileNamePattern>${LOG_DIR}/${LOG_FILE_APP}.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches -->
+        <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep days' worth of history -->
+      <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="HIBERNATE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${LOG_FILE_H}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/${LOG_FILE_H}.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches -->
+        <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep days' worth of history -->
+      <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="EXCHANGE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${LOG_FILE_EXCH}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/${LOG_FILE_EXCH}.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches -->
+        <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep days' worth of history -->
+      <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${EXCHANGE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!--  <appender name="KEYCLOAK" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+  <!--    <file>${LOG_DIR}/${LOG_FILE_K}.log</file>-->
+  <!--    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+  <!--      <fileNamePattern>${LOG_DIR}/${LOG_FILE_K}.%d{yyyy-MM-dd}.log.zip</fileNamePattern>-->
+  <!--    </rollingPolicy>-->
+
+  <!--    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">-->
+  <!--      <evaluator>-->
+  <!--        <expression>return message.contains("keycloak");</expression>-->
+  <!--      </evaluator>-->
+  <!--      <onMatch>ACCEPT</onMatch>-->
+  <!--      <onMismatch>DENY</onMismatch>-->
+  <!--    </filter>-->
+
+  <!--    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">-->
+  <!--      <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>-->
+  <!--    </triggeringPolicy>-->
+  <!--    <encoder>-->
+  <!--      <pattern>${FILE_PATTERN}</pattern>-->
+  <!--    </encoder>-->
+  <!--  </appender>-->
+
+  <appender name="SENSOR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${LOG_FILE_SENS}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/${LOG_FILE_SENS}.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches -->
+        <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep days' worth of history -->
+      <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${SENSOR_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="USER_REQ_SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <!-- in the absence of the class attribute, it is assumed that the
+         desired discriminator type is
+         ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+    <discriminator>
+      <key>username</key>
+      <defaultValue>unknown</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="USER-${username}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR_USER}/${LOG_FILE_USER}.${username}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <fileNamePattern>${LOG_DIR_USER}/${LOG_FILE_USER}.${username}.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+          <timeBasedFileNamingAndTriggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <!-- or whenever the file size reaches -->
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+          </timeBasedFileNamingAndTriggeringPolicy>
+          <!-- keep days' worth of history -->
+          <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+          <pattern>${FILE_PATTERN}</pattern>
+        </encoder>
+      </appender>
+    </sift>
+  </appender>
+
+  <appender name="USER_EX_SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <!-- in the absence of the class attribute, it is assumed that the
+         desired discriminator type is
+         ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+    <discriminator>
+      <key>username</key>
+      <defaultValue>unknown</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="USER-EXC-${username}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR_USER}/${LOG_FILE_USER}.${username}.${LOG_FILE_EX}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <fileNamePattern>${LOG_DIR_USER}/${LOG_FILE_USER}.${username}.${LOG_FILE_EX}.%d{yyyy-MM-dd}.%i.log.zip
+          </fileNamePattern>
+          <timeBasedFileNamingAndTriggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <!-- or whenever the file size reaches -->
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+          </timeBasedFileNamingAndTriggeringPolicy>
+          <!-- keep days' worth of history -->
+          <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+          <pattern>${FILE_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+          <level>ERROR</level>
+          <onMatch>ACCEPT</onMatch>
+          <onMismatch>DENY</onMismatch>
+        </filter>
+      </appender>
+    </sift>
+  </appender>
+
+  <appender name="USER_WARN_SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <!-- in the absence of the class attribute, it is assumed that the
+         desired discriminator type is
+         ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+    <discriminator>
+      <key>username</key>
+      <defaultValue>unknown</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="USER-WARN-${username}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR_USER}/${LOG_FILE_USER}.${username}.${LOG_FILE_WARN}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <fileNamePattern>${LOG_DIR_USER}/${LOG_FILE_USER}.${username}.${LOG_FILE_WARN}.%d{yyyy-MM-dd}.%i.log.zip
+          </fileNamePattern>
+          <timeBasedFileNamingAndTriggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <!-- or whenever the file size reaches -->
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+          </timeBasedFileNamingAndTriggeringPolicy>
+          <!-- keep days' worth of history -->
+          <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+          <pattern>${FILE_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+          <level>WARN</level>
+          <onMatch>ACCEPT</onMatch>
+          <onMismatch>DENY</onMismatch>
+        </filter>
+      </appender>
+    </sift>
+  </appender>
+
+  <appender name="ERRLVL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR_DEBUG}/${LOG_FILE_EX}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR_DEBUG}/${LOG_FILE_EX}.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches -->
+        <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep days' worth of history -->
+      <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+  </appender>
+
+  <appender name="WARNLVL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR_DEBUG}/${LOG_FILE_WARN}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR_DEBUG}/${LOG_FILE_WARN}.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- or whenever the file size reaches -->
+        <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep days' worth of history -->
+      <maxHistory>${LOG_FILE_MAX_HIST}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>WARN</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+  </appender>
+
+  <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+    <smtpHost>${mailHost}</smtpHost>
+    <smtpPort>${mailPort}</smtpPort>
+    <STARTTLS>${mailStartTls}</STARTTLS>
+
+    <from>Sense-it-test.md@server</from>
+    <to>alexei.guleac@orange.com</to>
+    <!--    <to>ANOTHER_EMAIL_DESTINATION</to> &lt;!&ndash; additional destinations are possible &ndash;&gt;-->
+    <subject>Sense-it-test.md: %logger{20} - %m</subject>
+
+    <layout class="ch.qos.logback.classic.html.HTMLLayout">
+    </layout>
+
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ERROR</level>
+    </filter>
+    <cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTracker">
+      <bufferSize>1</bufferSize>
+    </cyclicBufferTracker>
+    <asynchronousSending>false</asynchronousSending>
+  </appender>
+
+  <springProperty name="spring.datasource.driverClassName" source="spring.datasource.driver-class-name"/>
+  <springProperty name="spring.datasource.url" source="spring.datasource.url"/>
+  <springProperty name="spring.datasource.username" source="spring.datasource.username"/>
+  <springProperty name="spring.datasource.password" source="spring.datasource.password"/>
+
+  <!--  <appender name="DATABASE" class="ch.qos.logback.classic.db.DBAppender">-->
+  <!--    <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">-->
+  <!--      <driverClass>${spring.datasource.driverClassName}</driverClass>-->
+  <!--      <url>${spring.datasource.url}</url>-->
+  <!--      <user>${spring.datasource.username}</user>-->
+  <!--      <password>${spring.datasource.password}</password>-->
+  <!--    </connectionSource>-->
+  <!--  </appender>-->
+
+
+  <logger name="org.hibernate" level="INFO" additivity="false">
+    <appender-ref ref="HIBERNATE"/>
+  </logger>
+
+  <logger name="exchange" level="DEBUG" additivity="false">
+    <appender-ref ref="EXCHANGE"/>
+  </logger>
+
+  <logger name="sensor" level="DEBUG" additivity="false">
+    <appender-ref ref="SENSOR"/>
+  </logger>
+
+  <!--    Loggers setup according to Spring Profile-->
+  <springProfile name="t01 | dev-md | prod | t01-oro | prod-oro">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+      <!--      <appender-ref ref="USER_REQ_SIFT"/>-->
+      <appender-ref ref="USER_EX_SIFT"/>
+      <appender-ref ref="USER_WARN_SIFT"/>
+      <appender-ref ref="ERRLVL"/>
+      <appender-ref ref="WARNLVL"/>
+      <!--      to enable this in production -->
+      <!--      <appender-ref ref="EMAIL"/>-->
+    </root>
+  </springProfile>
+
+  <springProfile name="dev | t01-local">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+      <!--      <appender-ref ref="USER_REQ_SIFT"/>-->
+      <appender-ref ref="USER_EX_SIFT"/>
+      <appender-ref ref="USER_WARN_SIFT"/>
+      <appender-ref ref="ERRLVL"/>
+      <appender-ref ref="WARNLVL"/>
+    </root>
+  </springProfile>
+
+</configuration>

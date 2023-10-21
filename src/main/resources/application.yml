@@ -1,0 +1,73 @@
+
+server:
+  servlet:
+    context-path: "/api"
+    session:
+      timeout: 120
+      persistent: false
+      cookie:
+        secure: true
+        http-only: true
+
+spring:
+  profiles:
+    active:
+      - t01-local
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+    throw-exception-if-no-handler-found: true
+  jackson:
+    time-zone:
+      "Europe/Chisinau"
+    date-format: "dd.MM.yyyy"
+
+  jpa:
+    show-sql: true
+
+  liquibase:
+    enabled: false
+    drop-first: false
+    contexts: ${spring.profiles.active}
+
+  application:
+    name: ${info.app}
+
+  main:
+    allow-bean-definition-overriding: true
+
+access-token:
+  private: ${access_token_private_key_path}
+  public: ${access_token_public_key_path}
+refresh-token:
+  private: ${refresh_token_private_key_path}
+  public: ${refresh_token_public_key_path}
+
+info:
+  app: app-app-service
+  release: 0.1.0
+  team: Orange MD
+
+swagger:
+  enabled: true
+
+orange:
+  app:
+    jwtSecret: sercret
+    jwtExpirationMs: 3000000
+
+logging:
+  group:
+    swagger: springfox.documentation.spring.web.readers.operation, springfox.documentation.spring.web.scanners
+    apache-http-client-impl-auth: org.apache.http.impl.client.TargetAuthenticationStrategy
+  level:
+    swagger: WARN
+    apache-http-client-impl-auth: ERROR
+    org:
+      hibernate:
+        SQL: OFF
+#    org.springframework.orm.jpa: DEBUG
+#    org.springframework.transaction: DEBUG
+#    org.springframework.transaction.interceptor: TRACE
+
